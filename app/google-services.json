@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "473083258524",
+    "project_id": "quizappelalami",
+    "storage_bucket": "quizappelalami.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473083258524:android:109096565fb3bc76cbaf59",
+        "android_client_info": {
+          "package_name": "com.example.quizapp_elalami"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473083258524-pcl7ldgshvdqlgd81lmqmgb0a757o5v6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU6dN9mKW3wCzHGRlIRndLHDMXUZi31UU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "473083258524-pcl7ldgshvdqlgd81lmqmgb0a757o5v6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
