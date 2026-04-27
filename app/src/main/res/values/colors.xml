@@ -1,13 +1,16 @@
 <resources>
-
-    <color name="purple_200">#BB86FC</color>
-    <color name="purple_500">#6200EE</color>
-    <color name="purple_700">#3700B3</color>
-
-    <color name="teal_200">#03DAC5</color>
-    <color name="teal_700">#018786</color>
-
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
+    <!-- Modern Quiz App Palette -->
+    <color name="bg_light">#F5F7FA</color>
+    <color name="primary_green">#4CAF50</color>
+    <color name="primary_blue">#2196F3</color>
+    <color name="primary_blue_dark">#1976D2</color>
+    <color name="text_dark">#2D3436</color>
+    <color name="text_light">#636E72</color>
+    <color name="error_red">#E53935</color>
+    <color name="success_green">#009688</color>
+    <color name="warning_orange">#FFA726</color>
+    <color name="gray_light">#DFE6E9</color>
 </resources>

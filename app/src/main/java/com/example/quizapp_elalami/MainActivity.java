@@ -1,47 +1,119 @@
 package com.example.quizapp_elalami;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
-import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    //Step 1: Declaration
-    EditText etLogin, etPassword;
-    Button bLogin;
-    TextView tvRegister;
+
+    Button btnLocation, btnChooseCity;
+    TextView title;
+    FusedLocationProviderClient fusedLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Step 2: Recuperation des ids
-        etLogin = (EditText) findViewById(R.id.etMail);
-        etPassword = (EditText) findViewById(R.id.etPassword);
-        bLogin = (Button) findViewById(R.id.bLogin);
-        tvRegister = (TextView) findViewById(R.id.tvRegister);
-        //Step 3: Association de listeners
-        bLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Step 4: Traitement
-                if (etLogin.getText().toString().equals("toto") && etPassword.getText().toString().equals("123")){
-                    startActivity(new Intent(MainActivity.this, Quiz1.class));
-                }
-                else {
-                    Toast.makeText(getApplicationContext(),"Login or password incorrect !",Toast.LENGTH_SHORT).show();
-                }
-            }
+
+        btnLocation = findViewById(R.id.btnLocation);
+        btnChooseCity = findViewById(R.id.btnChooseCity);
+        title = findViewById(R.id.title);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Entry Animations
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+
+        title.startAnimation(fadeIn);
+        btnLocation.startAnimation(slideUp);
+        btnChooseCity.startAnimation(slideUp);
+
+        // Button Click Listeners with Animations
+        btnLocation.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
+            askPermission();
         });
-        tvRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Step 4: Traitement
-                startActivity(new Intent(MainActivity.this, Register.class));
-            }
+
+        btnChooseCity.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
+            showCityDialog();
         });
+    }
+
+    private void askPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        } else {
+            getLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getLocation();
+        } else {
+            Toast.makeText(this, "Permission refusée → default quiz", Toast.LENGTH_SHORT).show();
+            startQuiz("default");
+        }
+    }
+
+    private void getLocation() {
+        Toast.makeText(this, "Localisation en cours...", Toast.LENGTH_SHORT).show();
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener(location -> {
+                if (location != null) {
+                    new Thread(() -> {
+                        try {
+                            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                            String city = (addresses != null && !addresses.isEmpty()) ? addresses.get(0).getLocality() : "default";
+                            runOnUiThread(() -> startQuiz(city));
+                        } catch (Exception e) {
+                            runOnUiThread(() -> startQuiz("default"));
+                        }
+                    }).start();
+                } else {
+                    startQuiz("default");
+                }
+            });
+    }
+
+    private void showCityDialog() {
+        String[] cities = {"Casablanca", "Rabat", "Tanger", "Marrakech"};
+        new AlertDialog.Builder(this)
+                .setTitle("Choisir une ville")
+                .setItems(cities, (dialog, which) -> startQuiz(cities[which]))
+                .show();
+    }
+
+    private void startQuiz(String selectedCity) {
+        Intent i = new Intent(MainActivity.this, QuizActivity.class);
+        i.putExtra("city", selectedCity);
+        startActivity(i);
     }
 }

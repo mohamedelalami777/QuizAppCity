@@ -1,46 +1,68 @@
 package com.example.quizapp_elalami;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class Score extends AppCompatActivity {
-    Button bLogout, bTry;
+
+    TextView tvScorePercent, tvStatusTitle, tvStatusSubtitle, tvCorrect, tvWrong;
     ProgressBar progressBar;
-    TextView tvScore;
-    int score;
+    Button bTry, bLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score);
-        tvScore =(TextView) findViewById(R.id.tvScore);
-        progressBar=(ProgressBar) findViewById(R.id.progressBar);
-        bLogout=(Button) findViewById(R.id.bLogout);
-        bTry=(Button) findViewById(R.id.bTry);
-        Intent intent=getIntent();
-        score=intent.getIntExtra("score",0) ;
-        progressBar.setProgress(100*score/5);
-        tvScore.setText(100*score/5+" %");
-        //Toast.makeText(getApplicationContext(),score+"",Toast.LENGTH_SHORT).show();
-        bLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Merci de votre Participation !", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-        bTry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Score.this,Quiz1.class));
-            }
+
+        tvScorePercent = findViewById(R.id.tvScorePercent);
+        tvStatusTitle = findViewById(R.id.tvStatusTitle);
+        tvStatusSubtitle = findViewById(R.id.tvStatusSubtitle);
+        tvCorrect = findViewById(R.id.tvCorrect);
+        tvWrong = findViewById(R.id.tvWrong);
+        progressBar = findViewById(R.id.progressBar);
+        bTry = findViewById(R.id.bTry);
+        bLogout = findViewById(R.id.bLogout);
+
+        int score = getIntent().getIntExtra("score", 0);
+        int total = 5; // Assuming 5 questions
+        int percent = (score * 100) / total;
+
+        tvScorePercent.setText(percent + "%");
+        tvCorrect.setText(String.valueOf(score));
+        tvWrong.setText(String.valueOf(total - score));
+        progressBar.setProgress(percent);
+
+        if (percent >= 80) {
+            tvStatusTitle.setText("Excellent !");
+            tvStatusTitle.setTextColor(ContextCompat.getColor(this, R.color.success_green));
+            tvStatusSubtitle.setText("Vous avez une excellente connaissance de la ville !");
+        } else if (percent >= 50) {
+            tvStatusTitle.setText("Bien joué !");
+            tvStatusTitle.setTextColor(ContextCompat.getColor(this, R.color.warning_orange));
+            tvStatusSubtitle.setText("Pas mal du tout, vous y êtes presque !");
+        } else {
+            tvStatusTitle.setText("Essayez encore !");
+            tvStatusTitle.setTextColor(ContextCompat.getColor(this, R.color.error_red));
+            tvStatusSubtitle.setText("Continuez à explorer pour en savoir plus.");
+        }
+
+        bTry.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_click));
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         });
 
+        bLogout.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_click));
+            startActivity(new Intent(this, LoginActivity.class));
+            finishAffinity();
+        });
     }
 }
