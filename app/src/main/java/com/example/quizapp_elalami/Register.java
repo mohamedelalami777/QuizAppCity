@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class Register extends AppCompatActivity {
+
     EditText etMail, etPassword, etPassword1;
     Button bRegister, bBackToLogin;
 
@@ -25,33 +26,44 @@ public class Register extends AppCompatActivity {
         bRegister = findViewById(R.id.bRegister);
         bBackToLogin = findViewById(R.id.bBackToLogin);
 
+        // 🔥 REGISTER BUTTON
         bRegister.setOnClickListener(v -> {
+
             String mail = etMail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String passwordConfirm = etPassword1.getText().toString().trim();
 
-            if (TextUtils.isEmpty(mail) || TextUtils.isEmpty(password)) {
+            // ✔ Check fields
+            if (TextUtils.isEmpty(mail) || TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordConfirm)) {
                 Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // ✔ Check password match
             if (!password.equals(passwordConfirm)) {
                 Toast.makeText(this, "Les mots de passe ne correspondent pas", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Save using SharedPreferences
+            // ✔ Save user (SharedPreferences)
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(mail, password);
             editor.apply();
 
             Toast.makeText(this, "Compte créé avec succès !", Toast.LENGTH_SHORT).show();
-            finish(); // Go back to Login
+
+            // 🔥 IMPORTANT: Go to Login (NOT Main)
+            Intent i = new Intent(Register.this, LoginActivity.class);
+            startActivity(i);
+            finish();
         });
 
-        if (bBackToLogin != null) {
-            bBackToLogin.setOnClickListener(v -> finish());
-        }
+        // 🔙 Back to login button
+        bBackToLogin.setOnClickListener(v -> {
+            Intent i = new Intent(Register.this, LoginActivity.class);
+            startActivity(i);
+            finish();
+        });
     }
 }

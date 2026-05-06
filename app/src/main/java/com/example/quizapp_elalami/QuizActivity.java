@@ -40,7 +40,10 @@ public class QuizActivity extends AppCompatActivity {
         llAnswers = findViewById(R.id.llAnswers);
 
         city = getIntent().getStringExtra("city");
-        if (city == null) city = "default";
+        if (city == null || city.trim().isEmpty()) {
+            city = "casablanca";
+        }
+        city = city.trim().toLowerCase();
 
         loadQuestionsData();
 
@@ -126,18 +129,18 @@ public class QuizActivity extends AppCompatActivity {
             correct = new int[]{0, 0, 0, 0, 0};
         } else {
             questions = new String[]{
-                    "Le Maroc est en Afrique ?",
-                    "Monnaie ?",
-                    "Langue ?",
-                    "Ville touristique ?",
-                    "Plat marocain ?"
+                    "Casablanca est la plus grande ville du Maroc ?",
+                    "Quel club est à Casablanca ?",
+                    "La mer à Casa ?",
+                    "Stade principal ?",
+                    "Quartier connu ?"
             };
             answers = new String[][]{
                     {"Oui", "Non", "Peut-être"},
-                    {"Dirham", "Euro", "Dollar"},
-                    {"Arabe", "Chinois", "Russe"},
-                    {"Marrakech", "Paris", "Rome"},
-                    {"Couscous", "Pizza", "Burger"}
+                    {"Wydad", "FUS", "IRT"},
+                    {"Atlantique", "Méditerranée", "Aucune"},
+                    {"Mohammed V", "Adrar", "Marrakech"},
+                    {"Maarif", "Agdal", "Guéliz"}
             };
             correct = new int[]{0, 0, 0, 0, 0};
         }
