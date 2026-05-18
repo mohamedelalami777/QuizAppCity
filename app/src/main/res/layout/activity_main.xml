@@ -51,8 +51,34 @@
             android:id="@+id/btnChooseCity"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/button_primary"
             android:text="🏙️ Choisir une ville"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- 🗺️ Button Explorer -->
+        <Button
+            android:id="@+id/btnExplorer"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/button_primary"
+            android:text="🗺️ Explorer les villes"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- 🤖 Button AI Assistant -->
+        <Button
+            android:id="@+id/btnAI"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/button_primary"
+            android:text="🤖 Assistant IA"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="18sp"

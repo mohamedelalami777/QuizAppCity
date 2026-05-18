@@ -1,3 +1,6 @@
 <resources>
+    <string name="app_name">quizApp_elAlami</string>
     <string name="back_to_login">Back to Login</string>
+    <string name="explore_cities">🗺️ Explorer les villes</string>
+    <string name="ai_assistant">🤖 Assistant IA</string>
 </resources>
