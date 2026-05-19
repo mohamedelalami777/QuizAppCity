@@ -3,4 +3,8 @@
     <string name="back_to_login">Back to Login</string>
     <string name="explore_cities">🗺️ Explorer les villes</string>
     <string name="ai_assistant">🤖 Assistant IA</string>
+    <string name="take_photo">📸 Prendre une photo</string>
+    <string name="view_photos">🖼️ Voir mes photos</string>
+    <string name="photo_captured">Photo capturée avec succès</string>
+    <string name="my_gallery">Ma Galerie Quiz City</string>
 </resources>

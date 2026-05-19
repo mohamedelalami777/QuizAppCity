@@ -53,6 +53,8 @@ public class Score extends AppCompatActivity {
             tvStatusSubtitle.setText("Continuez à explorer pour en savoir plus.");
         }
 
+        // Supabase integration removed. Local behavior restored.
+
         bTry.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_click));
             startActivity(new Intent(this, MainActivity.class));

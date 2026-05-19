@@ -1,12 +1,16 @@
 package com.example.quizapp_elalami;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -23,6 +28,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int STARTUP_PERMISSIONS_REQUEST_CODE = 101;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int CAMERA_REQUEST_CODE = 102;
 
-    Button btnLocation, btnChooseCity, btnExplorer, btnAI;
+    Button btnLocation, btnChooseCity, btnExplorer, btnAI, btnCamera, btnViewPhotos;
     TextView title;
     FusedLocationProviderClient fusedLocationClient;
 
@@ -40,15 +47,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Binding views
         btnLocation = findViewById(R.id.btnLocation);
         btnChooseCity = findViewById(R.id.btnChooseCity);
         btnExplorer = findViewById(R.id.btnExplorer);
         btnAI = findViewById(R.id.btnAI);
+        btnCamera = findViewById(R.id.btnCamera);
+        btnViewPhotos = findViewById(R.id.btnViewPhotos);
         title = findViewById(R.id.title);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // 🎬 Animations
+        // Animations
         Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
 
@@ -57,33 +67,97 @@ public class MainActivity extends AppCompatActivity {
         btnChooseCity.startAnimation(slideUp);
         btnExplorer.startAnimation(slideUp);
         btnAI.startAnimation(slideUp);
+        btnCamera.startAnimation(slideUp);
+        btnViewPhotos.startAnimation(slideUp);
 
-        // 📍 Localisation
+        // Listeners
         btnLocation.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
             askLocationPermission();
         });
 
-        // 🏙️ Choix ville
         btnChooseCity.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
             showCityDialog();
         });
 
-        // 🗺️ Explorer les villes
         btnExplorer.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
             openMoroccoMap();
         });
 
-        // 🤖 Assistant IA
         btnAI.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
             startActivity(new Intent(MainActivity.this, ChatActivity.class));
         });
 
-        // 🛡️ Request Camera & Microphone permissions on launch
+        btnCamera.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
+            openCamera();
+        });
+
+        btnViewPhotos.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.press_scale));
+            startActivity(new Intent(MainActivity.this, PhotoGalleryActivity.class));
+        });
+
         requestStartupPermissions();
+    }
+
+    private void openCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+        } else {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+            if (imageBitmap != null) {
+                Uri savedUri = saveImageToGallery(imageBitmap);
+                if (savedUri != null) {
+                    Toast.makeText(this, "Photo enregistrée avec succès", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, CameraActivity.class);
+                    intent.putExtra("imageUri", savedUri.toString());
+                    startActivity(intent);
+                }
+            }
+        }
+    }
+
+    private Uri saveImageToGallery(Bitmap bitmap) {
+        Uri imageUri = null;
+        try {
+            String fileName = "QuizCity_" + System.currentTimeMillis() + ".jpg";
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/QuizCityPhotos");
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+            imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            if (imageUri != null) {
+                try (OutputStream out = getContentResolver().openOutputStream(imageUri)) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear();
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                    getContentResolver().update(imageUri, values, null, null);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imageUri;
     }
 
     private void openMoroccoMap() {
@@ -93,122 +167,61 @@ public class MainActivity extends AppCompatActivity {
         if (mapIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(mapIntent);
         } else {
-            // Fallback to web if Maps app is not installed
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=Morocco"));
-            startActivity(webIntent);
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=Morocco")));
         }
     }
 
     private void requestStartupPermissions() {
-        String[] permissions = {
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
-        };
-
-        boolean needsRequest = false;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                needsRequest = true;
-                break;
-            }
-        }
-
-        if (needsRequest) {
-            ActivityCompat.requestPermissions(this, permissions, STARTUP_PERMISSIONS_REQUEST_CODE);
-        }
+        String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+        ActivityCompat.requestPermissions(this, permissions, STARTUP_PERMISSIONS_REQUEST_CODE);
     }
 
-    // 🔐 Location Permission
     private void askLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             getLocation();
         }
     }
 
-    // 🔐 Result permissions handling
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == STARTUP_PERMISSIONS_REQUEST_CODE) {
-            boolean allGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
-            }
-            if (allGranted) {
-                Toast.makeText(this, "Permissions Caméra & Micro accordées", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Certaines permissions (Caméra/Micro) ont été refusées", Toast.LENGTH_SHORT).show();
+            // Basic handling for startup permissions
+        } else if (requestCode == CAMERA_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
             }
         } else if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getLocation();
-            } else {
-                Toast.makeText(this, "Permission localisation refusée → default quiz", Toast.LENGTH_SHORT).show();
-                startQuiz("default");
             }
         }
     }
 
-    // 📍 Get location logic
     private void getLocation() {
-        Toast.makeText(this, "Localisation en cours...", Toast.LENGTH_SHORT).show();
-
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        new Thread(() -> {
-                            try {
-                                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                                List<Address> addresses = geocoder.getFromLocation(
-                                        location.getLatitude(),
-                                        location.getLongitude(),
-                                        1
-                                );
-
-                                String city = "default";
-                                if (addresses != null && !addresses.isEmpty()) {
-                                    city = addresses.get(0).getLocality();
-                                }
-
-                                String finalCity = (city != null) ? city.toLowerCase().trim() : "default";
-                                runOnUiThread(() -> startQuiz(finalCity));
-
-                            } catch (Exception e) {
-                                runOnUiThread(() -> startQuiz("default"));
-                            }
-                        }).start();
-                    } else {
-                        startQuiz("default");
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener(location -> {
+            if (location != null) {
+                new Thread(() -> {
+                    try {
+                        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                        List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                        String city = (addresses != null && !addresses.isEmpty()) ? addresses.get(0).getLocality() : "default";
+                        runOnUiThread(() -> startQuiz(city));
+                    } catch (Exception e) {
+                        runOnUiThread(() -> startQuiz("default"));
                     }
-                });
+                }).start();
+            }
+        });
     }
 
-    // 🏙️ Dialog choix ville
     private void showCityDialog() {
         String[] cities = {"Casablanca", "Rabat", "Tanger", "Marrakech"};
-        new AlertDialog.Builder(this)
-                .setTitle("Choisir une ville")
-                .setItems(cities, (dialog, which) -> {
-                    String selectedCity = cities[which].toLowerCase().trim();
-                    startQuiz(selectedCity);
-                })
-                .show();
+        new AlertDialog.Builder(this).setTitle("Choisir une ville").setItems(cities, (dialog, which) -> startQuiz(cities[which])).show();
     }
 
-    // 🚀 Start Quiz
     private void startQuiz(String selectedCity) {
         Intent i = new Intent(MainActivity.this, QuizActivity.class);
         i.putExtra("city", selectedCity);

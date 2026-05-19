@@ -6,8 +6,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
         <package android:name="com.google.android.apps.maps" />
     </queries>
 
@@ -34,6 +38,9 @@
         <activity android:name=".Score" android:exported="false" />
         <activity android:name=".Register" android:exported="false" />
         <activity android:name=".ChatActivity" android:exported="false" />
+        <activity android:name=".CameraActivity" android:exported="false" />
+        <activity android:name=".PhotoGalleryActivity" android:exported="false" />
+        <activity android:name=".FullScreenPhotoActivity" android:exported="false" />
 
     </application>
 

@@ -61,8 +61,6 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void loadQuestionsData() {
-        city = city.toLowerCase().trim();
-
         if (city.equals("casablanca")) {
             questions = new String[]{
                     "Casablanca est la plus grande ville du Maroc ?",
@@ -129,18 +127,18 @@ public class QuizActivity extends AppCompatActivity {
             correct = new int[]{0, 0, 0, 0, 0};
         } else {
             questions = new String[]{
-                    "Casablanca est la plus grande ville du Maroc ?",
-                    "Quel club est à Casablanca ?",
-                    "La mer à Casa ?",
-                    "Stade principal ?",
-                    "Quartier connu ?"
+                    "Le Maroc est en Afrique ?",
+                    "Monnaie ?",
+                    "Langue ?",
+                    "Ville touristique ?",
+                    "Plat marocain ?"
             };
             answers = new String[][]{
                     {"Oui", "Non", "Peut-être"},
-                    {"Wydad", "FUS", "IRT"},
-                    {"Atlantique", "Méditerranée", "Aucune"},
-                    {"Mohammed V", "Adrar", "Marrakech"},
-                    {"Maarif", "Agdal", "Guéliz"}
+                    {"Dirham", "Euro", "Dollar"},
+                    {"Arabe", "Chinois", "Russe"},
+                    {"Marrakech", "Paris", "Rome"},
+                    {"Couscous", "Pizza", "Burger"}
             };
             correct = new int[]{0, 0, 0, 0, 0};
         }
@@ -152,21 +150,18 @@ public class QuizActivity extends AppCompatActivity {
         b2.setText(answers[index][1]);
         b3.setText(answers[index][2]);
 
-        // Fade in animation for new content
         Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         cvQuestion.startAnimation(fadeIn);
         llAnswers.startAnimation(fadeIn);
     }
 
     private void handleAnswerSelection(int selectedAnswer, View buttonView) {
-        // 1. Animate button (scale)
         buttonView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.scale_click));
 
         if (selectedAnswer == correct[index]) {
             score++;
         }
 
-        // 2. Fade out current content
         Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -178,10 +173,10 @@ public class QuizActivity extends AppCompatActivity {
                 if (index >= questions.length) {
                     Intent i = new Intent(QuizActivity.this, Score.class);
                     i.putExtra("score", score);
+                    i.putExtra("city", city);
                     startActivity(i);
                     finish();
                 } else {
-                    // 3. Load next content and fade it in
                     displayQuestion();
                 }
             }

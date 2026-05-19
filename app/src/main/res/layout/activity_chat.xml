@@ -39,6 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#20FFFFFF"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -52,6 +53,16 @@
             android:hint="Posez une question..."
             android:padding="12dp"
             android:textColor="@color/black" />
+
+        <ImageButton
+            android:id="@+id/btnMic"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/button_primary"
+            android:contentDescription="Microphone"
+            android:src="@android:drawable/ic_btn_speak_now"
+            app:tint="@color/white" />
 
         <ImageButton
             android:id="@+id/btnSend"

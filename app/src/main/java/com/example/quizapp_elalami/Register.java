@@ -26,43 +26,36 @@ public class Register extends AppCompatActivity {
         bRegister = findViewById(R.id.bRegister);
         bBackToLogin = findViewById(R.id.bBackToLogin);
 
-        // 🔥 REGISTER BUTTON
         bRegister.setOnClickListener(v -> {
-
             String mail = etMail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String passwordConfirm = etPassword1.getText().toString().trim();
 
-            // ✔ Check fields
             if (TextUtils.isEmpty(mail) || TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordConfirm)) {
                 Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // ✔ Check password match
             if (!password.equals(passwordConfirm)) {
                 Toast.makeText(this, "Les mots de passe ne correspondent pas", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // ✔ Save user (SharedPreferences)
+            // Save user locally (SharedPreferences) - Restored offline behavior
             SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(mail, password);
             editor.apply();
 
-            Toast.makeText(this, "Compte créé avec succès !", Toast.LENGTH_SHORT).show();
-
-            // 🔥 IMPORTANT: Go to Login (NOT Main)
+            Toast.makeText(Register.this, "Compte créé avec succès !", Toast.LENGTH_SHORT).show();
+            
             Intent i = new Intent(Register.this, LoginActivity.class);
             startActivity(i);
             finish();
         });
 
-        // 🔙 Back to login button
         bBackToLogin.setOnClickListener(v -> {
-            Intent i = new Intent(Register.this, LoginActivity.class);
-            startActivity(i);
+            startActivity(new Intent(Register.this, LoginActivity.class));
             finish();
         });
     }

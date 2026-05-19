@@ -38,7 +38,7 @@
             android:id="@+id/btnLocation"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/button_primary"
             android:text="📍 Utiliser ma localisation"
             android:textAllCaps="false"
@@ -51,7 +51,7 @@
             android:id="@+id/btnChooseCity"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/button_primary"
             android:text="🏙️ Choisir une ville"
             android:textAllCaps="false"
@@ -64,7 +64,7 @@
             android:id="@+id/btnExplorer"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/button_primary"
             android:text="🗺️ Explorer les villes"
             android:textAllCaps="false"
@@ -77,8 +77,34 @@
             android:id="@+id/btnAI"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/button_primary"
-            android:text="🤖 Assistant IA"
+            android:text="@string/ai_assistant"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- 📸 Button Take Photo -->
+        <Button
+            android:id="@+id/btnCamera"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/button_primary"
+            android:text="@string/take_photo"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- 🖼️ Button View Photos -->
+        <Button
+            android:id="@+id/btnViewPhotos"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/button_primary"
+            android:text="@string/view_photos"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
